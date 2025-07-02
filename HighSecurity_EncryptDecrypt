@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_LEN 100
+
+void xor_encrypt_printable(char *text, const char *key) {
+    int key_len = strlen(key);
+    for (int i = 0; text[i]; i++) {
+        unsigned char c = text[i] ^ key[i % key_len];
+        // Shift to printable range (32 to 126)
+        text[i] = (c % 95) + 32;
+    }
+}
+
+void xor_decrypt_printable(char *text, const char *key) {
+    int key_len = strlen(key);
+    for (int i = 0; text[i]; i++) {
+        unsigned char c = text[i] - 32;
+        text[i] = (c ^ key[i % key_len]);
+    }
+}
+
+int main() {
+    char message[MAX_LEN];
+    char key[MAX_LEN];
+
+    printf("Enter message: ");
+    fgets(message, MAX_LEN, stdin);
+    message[strcspn(message, "\n")] = 0;
+
+    printf("Enter key: ");
+    fgets(key, MAX_LEN, stdin);
+    key[strcspn(key, "\n")] = 0;
+
+    xor_encrypt_printable(message, key);
+    printf("Encrypted: %s\n", message);
+
+    xor_decrypt_printable(message, key);
+    printf("Decrypted: %s\n", message);
+
+    return 0;
+}
