@@ -1,0 +1,52 @@
+java -jar NSG2.jar
+wired scenario---
+node--duplex
+link----duplx
+agent type-----tcp-tcp sink
+                udp-null
+applications-ftp
+parameter-filename changing
+generate tcl script
+run ns prog.tcl--in command prompt
+then urs will get opened and u can edit it
+then go to file explorer --open ur file and there u will find agents definition and application definition remove that code and edit the below
+
+#===================================
+#        Agents Definition        
+#===================================
+#Setup a TCP connection
+set tcp0 [new Agent/TCP]
+$ns attach-agent $n3 $tcp0
+set sink1 [new Agent/TCPSink]
+$ns attach-agent $n0 $sink1
+$ns connect $tcp0 $sink1
+$tcp0 set packetSize_ 1500
+
+#Setup a UDP connection
+set udp2 [new Agent/UDP]
+$ns attach-agent $n4 $udp2
+set null3 [new Agent/Null]
+$ns attach-agent $n0 $null3
+$ns connect $udp2 $null3
+$udp2 set packetSize_ 1500
+
+#===================================
+#        Applications Definition        
+#===================================
+#Setup a FTP Application over TCP connection
+set ftp0 [new Application/FTP]
+$ftp0 attach-agent $tcp0
+$ns at 1.0 "$ftp0 start"
+$ns at 2.0 "$ftp0 stop"
+
+#Setup a CBR Application over UDP connection
+set cbr1 [new Application/Traffic/CBR]
+$cbr1 attach-agent $udp2
+$cbr1 set packetSize_ 1000
+$cbr1 set rate_ 1.0Mb
+$cbr1 set random_ null
+$ns at 1.0 "$cbr1 start"
+$ns at 2.0 "$cbr1 stop"
+
+
+then again open new terminal run tht file and click on play button ..then in a particular interval u can see the transmission
