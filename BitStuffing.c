@@ -29,8 +29,7 @@ int main() {
     char message[1000];
     char stuffed[2000];  // Output buffer, double size for safety
     char finalFrame[2050];
-
-uhiii
+    
     printf("Enter binary message (only 0 and 1): ");
     scanf("%s", message);
 
