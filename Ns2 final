@@ -1,0 +1,116 @@
+## 🧩 i. NS2 Simulator — Introduction (Basic Simulation)
+
+🎯 *Goal:* Just understand how NS2 works and verify animation output.
+
+*Setup:*
+
+* Scenario Type: *Wired*
+* *Nodes:* 2 nodes → n0 and n1
+* *Link Type:* Duplex link (so data can go both ways)
+* *Agent:* Use *TCP* on source (n0), *TCP Sink* on destination (n1)
+* *Application:* FTP (runs on TCP)
+* *Simulation time:* 10s
+* *Output Files:* intro.tr, intro.nam
+
+✅ *Expected result:* You’ll see packets moving between the 2 nodes (basic TCP connection).
+
+---
+
+## 🧩 ii. Simulate to Find the Number of Packets Dropped
+
+🎯 *Goal:* Create a situation where some packets are dropped.
+
+*Setup:*
+
+* Scenario Type: *Wired*
+* *Nodes:* 3 nodes → n0, n1, n2
+* *Links:*
+
+* n0 ↔ n1 → Duplex, bandwidth 1 Mb, delay 10 ms
+* n1 ↔ n2 → Duplex, bandwidth 0.5 Mb (smaller) → *causes drops*
+* *Agent:* TCP (on n0) → TCP Sink (on n2)
+* *Application:* FTP
+* *Simulation time:* 10s
+* *Output Files:* drop.tr, drop.nam
+
+✅ *Expected result:* Some packets get dropped (you’ll later count from drop.tr).
+
+---
+
+## 🧩 iii. Simulate to Find the Number of Packets Dropped by TCP/UDP
+
+🎯 *Goal:* Compare TCP and UDP behavior.
+
+*Setup:*
+
+* Scenario Type: *Wired*
+* *Nodes:* 4 nodes → n0, n1, n2, n3
+* *Links:*
+
+* n0 ↔ n2 (for TCP) → Duplex, 1 Mb
+* n1 ↔ n3 (for UDP) → Duplex, 1 Mb
+* n2 ↔ n3 (bottleneck link) → Duplex, 0.5 Mb
+* *Agents:*
+
+* TCP agent on n0 → TCP Sink on n3
+* UDP agent on n1 → Null agent on n3
+* *Applications:*
+
+* FTP on TCP connection
+* CBR (Constant Bit Rate) on UDP connection
+* *Simulation time:* 10s
+* *Output Files:* tcp_udp.tr, tcp_udp.nam
+
+✅ *Expected result:* UDP drops more packets than TCP (you’ll confirm with awk).
+
+---
+
+## 🧩 iv. Simulate to Find the Number of Packets Dropped due to Congestion
+
+🎯 *Goal:* Show congestion (too many sources sending to one destination).
+
+*Setup:*
+
+* Scenario Type: *Wired*
+* *Nodes:* 5 nodes → n0, n1, n2, n3, n4
+* *Links:*
+
+* n0 ↔ n3 → Duplex, 1 Mb
+* n1 ↔ n3 → Duplex, 1 Mb
+* n2 ↔ n3 → Duplex, 1 Mb
+* n3 ↔ n4 → Duplex, *0.5 Mb* (bottleneck link)
+* *Agents:*
+
+* TCP on n0, n1, and n2 (sources)
+* TCP Sink on n4 (destination)
+* *Applications:* FTP on each TCP source
+* *Simulation time:* 10–15s
+* *Output Files:* congestion.tr, congestion.nam
+
+✅ *Expected result:* Many packets dropped at the bottleneck link (n3↔n4) — congestion drops.
+
+---
+
+## 🧠 After Running
+
+Run in terminal:
+
+bash
+ns filename.tcl
+
+
+Then:
+
+bash
+awk '$1=="d"' filename.tr | wc -l
+
+
+→ gives total drops
+or
+
+bash
+awk '$1=="d" && tolower($5)=="tcp"' filename.tr | wc -l
+awk '$1=="d" && tolower($5)=="cbr"' filename.tr | wc -l
+
+
+→ gives TCP vs UDP drops.
